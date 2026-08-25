@@ -6,27 +6,28 @@
 
 ## Personal Info
 
-- **Name:** [Your Full Name]
+- **Name:** Larisa M. Soto
 - **Degree suffix:** [e.g., Ph.D., M.S., or leave blank]
 - **Email:** [your@email.com]
-- **Phone:** [+1 XXXXXXXXXX]
-- **Location:** [City, State ZIP]
-- **LinkedIn:** [URL or leave blank]
-- **Google Scholar:** [URL or leave blank]
-- **ORCID:** [URL or leave blank]
-- **Website:** [URL or leave blank]
+- **Phone:** +1 437 505 8222
+- **Location:** Toronto, Canada
+- **LinkedIn:** https://www.linkedin.com/in/larisa-msoto/
+- **Google Scholar:** 
+- **ORCID:** 
+- **Website:** https://github.com/larisa-msoto
+- **Languages:** Spanish, English, French
 
 ---
 
 ## Document Preferences
 
 - **Resume pages:** 2
-- **CV pages:** 5
-- **Resume bullet variant:** 2L (all variable bullets are 2-line)
+- **CV pages:** 2
+- **Resume Work Experience variant:** paragraph tiers (P-Short/Medium/Long) — see resume_reference.md
 - **CV bullet variant:** 2L/3L mix
 - **Skills config (resume):** 4-3-2-2-2 (13 lines, 5 groups)
 - **Skills config (CV):** 4-4-3-3-3 (17 lines, 5 groups)
-- **Immigration line:** Yes | "Authorized to work in the United States"
+- **Immigration line:** Yes | "Authorized to work in Mexico, Canada, and Europe"
 
 ---
 
@@ -59,8 +60,13 @@ Define the role types you're targeting. Each gets a bundle during setup.
 
 | Role Name | Target Employers | Tier | Bundle File |
 |-----------|-----------------|------|-------------|
-| _Example: National Lab_ | _DOE labs, national facilities_ | _1_ | _bundle_national_lab.md_ |
-| _Example: Industry R&D_ | _Tech companies, R&D divisions_ | _2_ | _bundle_industry_rd.md_ |
+| Bioinformatician | Academic institutions, Big Pharma R&D | 1 | bundle_bioinformatician.md |
+| Clinical Data Scientist | Health systems, pharma clinical data teams | 1 | bundle_clinical_data_scientist.md |
+| Computational Biologist | Academic + industry computational biology | 1 | bundle_computational_biologist.md |
+| AI Solutions & Enablement Specialist | AI/ML tooling, enablement, and training teams | 2 | bundle_ai_solutions_specialist.md |
+| AI Scientist | AI/ML research teams | 2 | bundle_ai_scientist.md |
+
+_Tiers/employers above are a best-effort read from your 5 existing resume variants — refine after review._
 
 **Tier guide:** 1 = strongest evidence, full portfolio | 2 = strong with targeted emphasis | 3 = viable with careful framing
 
@@ -83,15 +89,18 @@ These are copied verbatim from your template every time.
 
 - Education
 - Publications (CV)
-- Honors & Awards
-- Header block (name, contact, links)
+- Header block (name, contact, links, immigration line for resume)
 - _[Add any other fixed sections]_
+
+> Note: the 2-page **resume** format no longer includes an Honors & Awards section (dropped to match real-world convention). This does not apply to the CV format.
 
 ---
 
 ## Output Rules
 
 - **Email in all outputs:** [same as Personal Info email]
-- **Resume package:** [N] pages + 1-page cover letter
-- **CV package:** [N] pages + 1-2 page cover letter
-- **Output .tex files ONLY** — user compiles locally
+- **Resume package:** 2 pages (.docx, via `docx_builder.py`) + 1-page cover letter (.docx)
+- **CV package:** [N] pages (.tex, user compiles locally) + 1-2 page cover letter (.docx)
+- **Resume/CL output:** `.docx` only — no auto PDF export. Open in Word, confirm page fit, export to PDF yourself when submitting.
+- **CV output:** `.tex` — user compiles locally with a LaTeX distribution.
+- **Prerequisite for resume/CL:** `pip install python-docx pyyaml`. LaTeX distribution only needed if you use the CV format.

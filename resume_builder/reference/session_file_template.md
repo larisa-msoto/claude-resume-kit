@@ -12,7 +12,7 @@ Every JD gets a persistent session file: `output/<FolderName>/session_<name>.md`
 - **Role:** [title]
 - **Company:** [company] ([context])
 - **Bundle:** [role_type]
-- **Format:** [Resume/CV] ([N]-page, [cls]) + [N]-page cover letter
+- **Format:** [Resume (docx)/CV (LaTeX)] ([N]-page) + [N]-page cover letter (docx)
 - **Salary/Details:** [if available]
 
 ## JD Analysis
@@ -61,9 +61,25 @@ Every JD gets a persistent session file: `output/<FolderName>/session_<name>.md`
 - **Jargon level:** HR-safe / Technical / Academic
 - **"Why them" hook:** [specific connection to their work]
 
-## Bullet Plan
+## Content Plan
 
 Note: Any FIXED positions (e.g., internships) are not included in this plan.
+
+**Resume format** (paragraph tiers, not bullets):
+
+### Position 1 (Tier: [P-Short/Medium/Long])
+| # | ID | Achievement | Include? | Rationale |
+|---|-----|------------|----------|-----------|
+
+### Position 2 (Tier: ...)
+[same table]
+
+### Technical Skills / Work Samples / Cross-Functional Leadership
+[flat bullet selections per section, 5-7 / 3-5 items each]
+
+**Budget:** [N] total words vs target [T] (see resume_reference.md)
+
+**CV format** (bullets, if this format instead):
 
 ### Position 1 ([N] bullets, [N] rendered lines)
 | # | ID | Achievement | Variant | Lines | Rationale |
@@ -72,14 +88,12 @@ Note: Any FIXED positions (e.g., internships) are not included in this plan.
 ### Position 2 ([N] bullets, [N] rendered lines)
 [same table]
 
-### Position 3 ([N] bullets, [N] rendered lines)
-[same table]
-
 **Budget:** [N] variable bullets, [N] rendered lines vs target [N]
 
 ## Output Files
-- Resume/CV: `output/<FolderName>/e2e_<name>_[resume|cv].tex`
-- Cover Letter: `output/<FolderName>/e2e_<name>_cover_letter.tex`
+- **Resume (docx):** `output/<FolderName>/e2e_<name>_resume.yaml` + `.docx`
+- **CV (LaTeX):** `output/<FolderName>/e2e_<name>_cv.tex`
+- **Cover Letter (docx):** `output/<FolderName>/e2e_<name>_cover_letter.yaml` + `.docx`
 - Critique: `output/<FolderName>/critique_<name>.md`
 
 ## Critique Summary
@@ -95,14 +109,16 @@ Note: Any FIXED positions (e.g., internships) are not included in this plan.
 
 ## Status
 - Phase 0: [PENDING | DONE]
-- Phase 1: [PENDING | DONE (N bullets confirmed)]
+- Phase 1: [PENDING | DONE (N positions/bullets confirmed)]
 - Phase 2 Resume:
+  - Header: [PENDING | DONE]
   - Summary: [PENDING | DONE]
   - Skills: [PENDING | DONE]
-  - Position 1 ([N] bullets): [PENDING | DONE | IN_PROGRESS]
-  - Position 2 ([N] bullets): [PENDING | DONE | IN_PROGRESS]
-  - Position 3 ([N] bullets): [PENDING | DONE | IN_PROGRESS]
-  - Compile: [PENDING | DONE]
+  - Position 1 (Tier: [P-Short/Medium/Long] or [N] bullets for CV): [PENDING | DONE | IN_PROGRESS]
+  - Position 2: [PENDING | DONE | IN_PROGRESS]
+  - Work Samples: [PENDING | DONE] *(resume only)*
+  - Cross-Functional Leadership: [PENDING | DONE] *(resume only)*
+  - Render (resume/CL) or Compile (CV): [PENDING | DONE]
 - Cover Letter: [PENDING | IN_PROGRESS | DONE]
 - Critique: [PENDING | IN_PROGRESS | CURRENT (score) | STALE]
 - **Next:** [exact command to copy after /clear]
@@ -113,6 +129,6 @@ Note: Any FIXED positions (e.g., internships) are not included in this plan.
 ## Context Efficiency Notes
 
 - Session 1 (resume): resume_reference.md + critical_rules.md re-read + experience files + bundle + support files + template. Peak depends on knowledge base size.
-- Session 2 (CL): cl_reference.md + significance files (if available) + session file + resume .tex + bundle S5. Much lighter context.
-- Session 3 (critique): critique_framework.md + session file + both .tex + bundle. Moderate context.
+- Session 2 (CL): cl_reference.md + significance files (if available) + session file + resume content YAML (or .tex for CV) + bundle S5. Much lighter context.
+- Session 3 (critique): critique_framework.md + session file + resume/CL content YAML (or .tex for CV) + bundle. Moderate context.
 - Folder created in Phase 0 — all files go to output/<FolderName>/ from the start.

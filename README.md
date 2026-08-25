@@ -2,7 +2,7 @@
 
 Most AI resume tools work the same way: paste resume + paste JD, get a rewrite. They don't know which of your papers is published vs. under review. They don't know you only ran the simulations, not the experiments. They'll upgrade "contributed to" into "developed" without blinking.
 
-This is different. You extract your papers, codebases, and reports once — the system asks structured questions about each one. After that, every new application is just pointing it at a JD. It picks the right achievements, frames them for the audience, enforces accuracy, and generates LaTeX you compile locally.
+This is different. You extract your papers, codebases, and reports once — the system asks structured questions about each one. After that, every new application is just pointing it at a JD. It picks the right achievements, frames them for the audience, enforces accuracy, and generates a ready-to-open Word document (resume + cover letter) — or LaTeX if you use the academic CV format.
 
 Built for researchers and engineers with lots of source material (papers, code, reports) who apply to many positions across different employer types.
 
@@ -18,18 +18,20 @@ Built for researchers and engineers with lots of source material (papers, code, 
 
 **Multi-perspective critique.** Five reader personas (ATS bot through technical reviewer) score your resume across 8 dimensions in a fresh context window.
 
-**LaTeX output, locally compiled.** No data leaves your machine beyond the Claude Code conversation.
+**Local output, no cloud rendering.** Resume and cover letter render straight to `.docx` on your machine via `python-docx`; the academic CV format still compiles LaTeX locally. No data leaves your machine beyond the Claude Code conversation.
 
 ---
 
 ## Example Output
 
-Here's what the system generates for the included fictional researcher (Dr. Jordan Chen, computational biologist) applying to a tenure-track faculty position:
+Here's what the system generates for the included fictional researcher (Dr. Jordan Chen, computational biologist) applying to a tenure-track faculty position — this JD calls for the 5-page academic CV format, so it compiles to PDF via LaTeX; the cover letter always renders to `.docx`:
 
-- [Example Resume (PDF)](resume_builder/examples/example_resume.pdf) — 2-page resume with JD-tailored bullets, skills, and publications
-- [Example Cover Letter (PDF)](resume_builder/examples/example_cover_letter.pdf) — 1-page academic cover letter with specific hooks
+- [Example CV (PDF)](resume_builder/examples/example_cv.pdf) — 3-page CV with JD-tailored research experience, fellowships, and full publication list
+- [Example Cover Letter (docx)](resume_builder/examples/example_cover_letter.docx) — 1-page academic cover letter with specific hooks
 - [Example Session File](resume_builder/examples/example_session_file.md) — the decision log that produced this output
-- [Source .tex files](resume_builder/examples/output/) — the LaTeX source Claude generated
+- [Source files](resume_builder/examples/output/) — the CV `.tex` source and cover letter content YAML Claude generated
+
+A 2-page resume applying to an industry role would instead produce a `.docx` throughout — see [DOCS.md](DOCS.md) for the format split.
 
 All example data is in `resume_builder/examples/` — extraction, experience file, bundle, config, and session file.
 
@@ -55,7 +57,8 @@ Each step uses a **separate Claude Code session** for best quality (fresh contex
 ## Prerequisites
 
 - **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** CLI installed and authenticated
-- **A LaTeX distribution** for compiling `.tex` to `.pdf` (e.g., [TeX Live](https://tug.org/texlive/), [MacTeX](https://tug.org/mactex/), [MiKTeX](https://miktex.org/))
+- **Python packages for resume/cover letter generation:** `pip install python-docx pyyaml`
+- **A LaTeX distribution** — only needed if you use the 5-page academic CV format (e.g., [TeX Live](https://tug.org/texlive/), [MacTeX](https://tug.org/mactex/), [MiKTeX](https://miktex.org/)); the 2-page resume and cover letter render directly to `.docx`, no LaTeX required
 - **Your research papers** or project documentation ready for extraction
 
 ---
@@ -71,7 +74,7 @@ claude
 /make-resume JDs/example_jd.txt
 ```
 
-This runs the full pipeline — JD analysis, bullet selection, LaTeX generation — using the included example data. No setup required.
+This runs the full pipeline — JD analysis, content selection, `.docx` generation — using the included example data. No setup required.
 
 ---
 
@@ -104,9 +107,11 @@ Claude reads the paper, asks clarifying questions about your contributions, and 
 
 This synthesizes all extractions into experience files, role-type bundles, and support files.
 
-### 4. Customize your LaTeX templates
+### 4. Customize your templates
 
-Open the templates in `resume_builder/templates/` and fill in your FIXED sections — education, header, awards, publications. The `[CONFIG: ...]` placeholders show you what to fill in.
+For the resume/cover letter (docx): open `resume_builder/templates/resume_content_template.yaml` and `cover_letter_content_template.yaml`, fill in your FIXED fields — header contact info, education, publication author blocks. The `[CONFIG: ...]` placeholders show you what to fill in.
+
+For the academic CV (LaTeX, optional): open `cv_template.tex` and fill in its FIXED sections the same way.
 
 ### 5. Generate for a job
 
@@ -123,9 +128,9 @@ Then in separate sessions: `/make-cl` for the cover letter, `/critique` for a sc
 ```
 Your Papers --> /setup-extract --> Extractions --> /setup-build-kb --> Knowledge Base
                                                                           |
-Job Description --> /make-resume --> Tailored Resume/CV (.tex)            |
+Job Description --> /make-resume --> Tailored Resume (.docx) or CV (.tex) |
                         |              v                                  |
-                   /make-cl --> Cover Letter (.tex)                       |
+                   /make-cl --> Cover Letter (.docx)                      |
                         |              v                                  |
                    /critique --> 8-Part Score + AI Scan + Fixes           |
                         |              v                                  |
@@ -136,9 +141,9 @@ Job Description --> /make-resume --> Tailored Resume/CV (.tex)            |
 |-------|---------|-------|--------|
 | `/setup-extract` | Extract structured data from a paper | Paper path | `knowledge_base/extractions/*.md` |
 | `/setup-build-kb` | Build KB from extractions | All extractions | `resume_builder/{experience,bundles,support}/` |
-| `/make-resume` | Generate tailored resume or CV | JD path | `output/<Folder>/e2e_*.tex` + session file |
-| `/make-cl` | Generate matching cover letter | Session file | `output/<Folder>/*_cover_letter.tex` |
-| `/edit-resume` | Edit resume/CV/CL from feedback | Session + feedback | Updated `.tex` files |
+| `/make-resume` | Generate tailored resume or CV | JD path | Resume: `output/<Folder>/e2e_*.yaml` + `.docx`. CV: `.tex` + session file |
+| `/make-cl` | Generate matching cover letter | Session file | `output/<Folder>/*_cover_letter.yaml` + `.docx` |
+| `/edit-resume` | Edit resume/CV/CL from feedback | Session + feedback | Updated `.yaml`/`.docx` (resume/CL) or `.tex` (CV) |
 | `/critique` | Independent quality review | Session file | `output/<Folder>/critique_*.md` |
 
 ---

@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Count rendered characters in LaTeX resume/CV bullets.
+Count rendered characters in LaTeX CV bullets.
 Strips LaTeX markup to show what a reader actually sees on the page.
+
+CV format only -- the resume/cover letter pipeline uses content_check.py
+(word counts) instead, since it renders to .docx via docx_builder.py.
 
 Usage:
   python3 char_count.py "\\textbf{DFT} analysis of \\ce{TiO2} surfaces"
@@ -83,23 +86,15 @@ def count_em_dashes(text):
     return len(re.findall(r'---', text))
 
 
-def classify_bullet(char_count, bold_chars, fmt):
-    """Classify bullet into variant and check limits."""
-    if fmt == 'resume':
-        base = 119
-        penalty = 0.5
-        tiers = [
-            ('1L', 105, 111, 117, None),
-            ('2L', 189, 205, 218, 78),
-        ]
-    else:
-        base = 91
-        penalty = 0.25
-        tiers = [
-            ('1L', 88, 93, 101, None),
-            ('2L', 168, 182, 190, 65),
-            ('3L', 250, 268, 280, 65),
-        ]
+def classify_bullet(char_count, bold_chars):
+    """Classify a CV bullet (\\item) into a 1L/2L/3L variant and check limits."""
+    base = 91
+    penalty = 0.25
+    tiers = [
+        ('1L', 88, 93, 101, None),
+        ('2L', 168, 182, 190, 65),
+        ('3L', 250, 268, 280, 65),
+    ]
 
     effective = base - (penalty * bold_chars)
 
@@ -116,16 +111,16 @@ def classify_bullet(char_count, bold_chars, fmt):
     return 'OVER', 'OVER LIMIT', 0, 0, 0, None, effective
 
 
-def format_one(raw, fmt):
+def format_one(raw):
     """Format analysis for a single bullet."""
     rendered = strip_latex(raw)
     n = len(rendered)
     bold = count_bold_chars(raw)
     em = count_em_dashes(raw)
 
-    variant, status, lo, hi, hard_max, orphan, eff = classify_bullet(n, bold, fmt)
+    variant, status, lo, hi, hard_max, orphan, eff = classify_bullet(n, bold)
 
-    parts = [f"  {n:3d} chars | {variant} {fmt.upper()} | {status} (target {lo}-{hi}, max {hard_max})"]
+    parts = [f"  {n:3d} chars | {variant} CV | {status} (target {lo}-{hi}, max {hard_max})"]
     if bold:
         parts.append(f"  Bold: {bold} chars -> effective limit/line: {eff:.0f}")
     if em:
@@ -146,11 +141,11 @@ def extract_items(text):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Count rendered characters in LaTeX resume/CV bullets')
+        description='Count rendered characters in LaTeX CV bullets')
     parser.add_argument('input', nargs='?',
                         help='Bullet text or .tex file path')
-    parser.add_argument('-f', '--format', choices=['resume', 'cv'],
-                        default='resume', help='Document format (default: resume)')
+    parser.add_argument('-f', '--format', choices=['cv'],
+                        default='cv', help='Document format (CV only)')
     parser.add_argument('--raw', action='store_true',
                         help='Output only char count (for scripting)')
     args = parser.parse_args()
@@ -162,12 +157,12 @@ def main():
             print("No \\item lines found.")
             return
         total_lines = 0
-        print(f"Found {len(items)} bullets ({args.format} format):\n")
+        print(f"Found {len(items)} bullets (cv format):\n")
         for i, item in enumerate(items, 1):
             if args.raw:
                 print(len(strip_latex(item)))
             else:
-                report, variant = format_one(item, args.format)
+                report, variant = format_one(item)
                 print(f"Bullet {i}:")
                 print(report)
                 print()
@@ -179,7 +174,7 @@ def main():
         if args.raw:
             print(len(strip_latex(args.input)))
         else:
-            report, _ = format_one(args.input, args.format)
+            report, _ = format_one(args.input)
             print(report)
     else:
         for line in sys.stdin:
@@ -189,7 +184,7 @@ def main():
             if args.raw:
                 print(len(strip_latex(line)))
             else:
-                report, _ = format_one(line, args.format)
+                report, _ = format_one(line)
                 print(report)
                 print()
 

@@ -23,8 +23,8 @@ resume_builder/
 │   ├── critical_rules.md        # Compact re-read — /make-resume Phase 2
 │   ├── session_file_template.md # Session file format
 │   └── critique_framework.md    # 8-part critique system
-├── templates/                   # LaTeX .cls + .tex templates
-├── helpers/                     # char_count.py
+├── templates/                   # Resume/CL: content YAML templates (docx). CV: LaTeX .cls + .tex templates.
+├── helpers/                     # docx_builder.py + content_check.py (resume/CL) | char_count.py (CV)
 ├── examples/                    # Example KB for a fictional researcher
 ├── experience/                  # /setup-build-kb outputs: one file per position
 ├── bundles/                     # /setup-build-kb outputs: one per target role type
@@ -49,7 +49,8 @@ You are simultaneously:
 You write as the strategist but critique as the reader.
 
 **Hard rules:**
-- Output .tex files ONLY. User compiles locally.
+- Resume & cover letter: output content YAML + rendered `.docx` (via `docx_builder.py`). No auto PDF export — user exports from Word themselves.
+- CV: output `.tex` files ONLY. User compiles locally (unchanged).
 - Read `config.md` for email, provenance flags, and output preferences.
 - **Accuracy > Relevance > Impact > ATS > Brevity**
 
@@ -58,10 +59,10 @@ You write as the strategist but critique as the reader.
 ## User Focus Directives
 
 - **"Emphasize X"** — prioritize X-related achievements
-- **"Downplay Y"** — reduce or omit Y-related bullets
+- **"Downplay Y"** — reduce or omit Y-related bullets/positions
 - **"Include Z"** — force-include achievement Z
-- **"Lead with A"** — make A the first bullet in its position
-- **"Make B a 2L"** — override default variant
+- **"Lead with A"** — make A the first bullet/position in its section
+- **"Make B a P-Long"** (resume) / **"Make B a 2L"** (CV) — override default variant
 
 If no directives, use bundle's Priority Matrix defaults.
 
@@ -109,9 +110,11 @@ Institutional project funding (grants, internal R&D programs) is NOT a personal 
 
 ---
 
-## LaTeX Scientific Notation (MANDATORY)
+## Inline Markup
 
-All templates load `mhchem` (`\usepackage[version=4]{mhchem}`). Use these conventions:
+**Resume & cover letter (docx):** use plain Unicode characters directly — `TiO2` as `TiO₂`, `β`, `α`, `~64` for "approximately," `°C`. Use `**bold**` for bold and `[text](url)` for links; `docx_builder.py` parses both into real Word formatting. No LaTeX notation needed.
+
+**CV (LaTeX, unchanged) — MANDATORY notation.** `cv.cls` loads `mhchem` (`\usepackage[version=4]{mhchem}`):
 
 | Item | Correct LaTeX | Wrong | Rendered |
 |------|--------------|-------|----------|
@@ -120,9 +123,9 @@ All templates load `mhchem` (`\usepackage[version=4]{mhchem}`). Use these conven
 | Greek letters | `$\beta$`, `$\alpha$` | `beta`, `alpha` | β, α |
 | Approximately | `$\sim$64` | `~64` (LaTeX non-breaking space!) | ~64 |
 
-**CRITICAL:** `~` in LaTeX is a non-breaking space, NOT a tilde. Use `$\sim$` for "approximately."
+**CRITICAL (CV only):** `~` in LaTeX is a non-breaking space, NOT a tilde. Use `$\sim$` for "approximately."
 
-For char counting: `\ce{TiO2}` → 4 rendered chars, `$\beta$` → 1 rendered char.
+For CV char counting: `\ce{TiO2}` → 4 rendered chars, `$\beta$` → 1 rendered char.
 
 ---
 

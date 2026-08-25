@@ -13,26 +13,27 @@ claude-resume-kit/
 ├── .claude/skills/                    # 6 skills (invoked as /skill-name)
 │   ├── setup-extract/SKILL.md         # Extract from papers → structured data
 │   ├── setup-build-kb/SKILL.md        # Synthesize KB from extractions
-│   ├── make-resume/SKILL.md           # JD → tailored resume/CV (.tex)
-│   ├── make-cl/SKILL.md              # Session → cover letter (.tex)
+│   ├── make-resume/SKILL.md           # JD → tailored resume (.docx) or CV (.tex)
+│   ├── make-cl/SKILL.md              # Session → cover letter (.docx)
 │   ├── edit-resume/SKILL.md           # Edit from critique/feedback
 │   └── critique/SKILL.md             # Independent quality review
 ├── resume_builder/
 │   ├── reference/                     # Generation rules and protocols
 │   │   ├── shared_ops.md              # Session workflow (all skills read this)
-│   │   ├── resume_reference.md        # Resume/CV formatting rules
+│   │   ├── resume_reference.md        # Resume (docx/word-count) + CV (LaTeX/char-count) rules
 │   │   ├── cl_reference.md            # Cover letter rules
 │   │   ├── critical_rules.md          # Compact re-read for generation phase
 │   │   ├── session_file_template.md   # Session file format spec
 │   │   └── critique_framework.md      # 8-part critique system
-│   ├── templates/                     # LaTeX .cls classes + .tex templates
-│   │   ├── resume.cls                 # 2-page resume class
-│   │   ├── cv.cls                     # Multi-page CV class
-│   │   ├── resume_template.tex        # Resume structural template
-│   │   ├── cv_template.tex            # CV structural template
-│   │   └── coverletter_template.tex   # Cover letter template
+│   ├── templates/
+│   │   ├── resume_content_template.yaml    # Resume structural template (docx pipeline)
+│   │   ├── cover_letter_content_template.yaml  # Cover letter structural template (docx pipeline)
+│   │   ├── cv.cls                     # CV LaTeX class (academic format only)
+│   │   └── cv_template.tex            # CV structural template (LaTeX)
 │   ├── helpers/
-│   │   └── char_count.py              # Character counting utility for bullets
+│   │   ├── docx_builder.py            # Renders resume/CL content YAML → .docx
+│   │   ├── content_check.py           # Word-count budget validator (resume/CL)
+│   │   └── char_count.py              # Character-count budget validator (CV only)
 │   ├── examples/                      # Fictional "Dr. Jordan Chen" — full worked example
 │   ├── experience/                    # YOUR experience files (built by /setup-build-kb)
 │   ├── bundles/                       # YOUR role-type bundles (built by /setup-build-kb)
@@ -42,7 +43,7 @@ claude-resume-kit/
 │   ├── papers/                        # Drop your PDFs / .tex source here
 │   └── notes/                         # Any other reference material
 ├── JDs/                               # Job descriptions (text files)
-└── output/                            # Generated .tex files, session files, critiques
+└── output/                            # Generated content YAMLs/.docx (resume/CL), .tex (CV), session files, critiques
 ```
 
 ---
@@ -54,7 +55,7 @@ claude-resume-kit/
 Every JD gets a session file (`output/<Folder>/session_<name>.md`) that tracks:
 - JD analysis and ATS keywords
 - Which bundle was selected
-- Bullet plan (which achievements, in what order, at what length)
+- Content plan (which achievements, in what order, at what paragraph tier/bullet length)
 - All generation decisions and their rationale
 - Cover letter plan
 - Critique scores
@@ -107,13 +108,13 @@ The `/critique` skill runs a multi-part assessment:
 For best results, use a **separate Claude Code session** for each step. This gives each skill fresh context, which produces better quality (especially for critique — you want fresh eyes, not the same context that generated the resume).
 
 ```
-Session 1:  /make-resume JDs/job.txt     → resume/CV .tex
+Session 1:  /make-resume JDs/job.txt     → resume .docx (or CV .tex)
             /clear
-Session 2:  /make-cl                      → cover letter .tex
+Session 2:  /make-cl                      → cover letter .docx
             /clear
 Session 3:  /critique                     → critique .md with score
             /clear
-            /edit-resume                  → refined .tex (if needed)
+            /edit-resume                  → refined .docx/.tex (if needed)
 ```
 
 ---
@@ -125,7 +126,7 @@ Session 3:  /critique                     → critique .md with score
 | Setting | What it controls | Example |
 |---------|-----------------|---------|
 | **Personal Info** | Name, email, phone, links on all outputs | Your contact details |
-| **Document Preferences** | Page counts, bullet line variants, skills layout | `Resume: 2 pages, CV: 5 pages` |
+| **Document Preferences** | Page counts, paragraph/bullet variants, skills layout | `Resume: 2 pages, CV: 5 pages` |
 | **Provenance Flags** | What claims are safe to make | `ML paper: under review → never say "published"` |
 | **Role Types** | Target audiences and their bundles | `Academic (Tier 1), Industry R&D (Tier 2)` |
 | **Decision Tree** | How JD keywords map to role types | `"tenure-track" → Academic` |
@@ -133,13 +134,20 @@ Session 3:  /critique                     → critique .md with score
 | **Output Rules** | Package formats and constraints | `Resume: 2pg + 1pg CL = 3pg package` |
 | **KB Corrections** | Errors to never re-introduce | `Spearman is 0.82, not 0.85` |
 
-### LaTeX Templates (edit directly)
+### Resume/Cover Letter Templates (docx pipeline — edit directly)
 
-- **Fonts, colors, spacing** — modify `.cls` files
-- **Section order** — reorder sections in `.tex` templates
+- **Fonts, colors, margins, heading style** — modify the `STYLE` dict at the top of `resume_builder/helpers/docx_builder.py` (one change affects every future resume/CL)
+- **Section order** — code-locked in `docx_builder.py`'s `build_resume()`/`build_cover_letter()`; reorder there if you want a different structure
+- **FIXED content** — fill in education, publications, header contact fields in `resume_content_template.yaml`
+- **Word-count budgets** — adjust the tier ranges in `resume_reference.md`/`critical_rules.md` and the matching tiers in `content_check.py`
+
+### CV Templates (LaTeX, academic format only — edit directly)
+
+- **Fonts, colors, spacing** — modify `cv.cls`
+- **Section order** — reorder sections in `cv_template.tex`
 - **FIXED content** — fill in education, awards, publications, header
 - **Icons** — replace `GS.png` / `orcid.png` with your own
-- **Page geometry** — adjust margins in `.cls` if needed
+- **Page geometry** — adjust margins in `cv.cls` if needed
 
 ### Knowledge Base (built by skills, then editable)
 
@@ -174,10 +182,10 @@ Each skill is a markdown file in `.claude/skills/<name>/SKILL.md`. You can:
 ## Key Design Decisions
 
 - **Accuracy > Relevance > Impact > ATS > Brevity** — the priority hierarchy for every generation decision
-- **LaTeX-only output** — Claude generates `.tex`, you compile locally. No formatting surprises.
+- **Local, no-cloud output** — resume/CL render straight to `.docx` via `python-docx`; the CV format still compiles LaTeX locally. No formatting service, no data leaves your machine beyond the Claude Code conversation.
 - **FLIPPED position format** — the bold line under each position title is a JD-customized theme, not a generic description. This is the strongest tailoring lever.
-- **Structured provenance** — every achievement is tracked from source paper through extraction to experience file to resume bullet
-- **Character-precise budgets** — every bullet is calibrated to fit the template geometry, not "try to keep it short"
+- **Structured provenance** — every achievement is tracked from source paper through extraction to experience file to resume content
+- **Calibrated budgets, not exact guarantees** — resume/CL content targets word-count tiers (Word reflows, so there's no exact per-line promise); the CV format still uses character-precise budgets calibrated to its fixed LaTeX geometry
 - **Session files as state** — all decisions for a JD live in one file. Skills can recover from interruptions.
 - **Anti-fabrication by design** — provenance flags, verb discipline, and corrections logs prevent overclaiming even under pressure to impress
 - **AI fingerprint avoidance** — a dedicated rules file is loaded by all generation and critique skills, covering banned words and phrases (with technical exceptions), structural anti-patterns, positive markers, and a 12-item post-generation checklist
@@ -187,7 +195,10 @@ Each skill is a markdown file in `.claude/skills/<name>/SKILL.md`. You can:
 ## FAQ
 
 **Q: Do I need to know LaTeX?**
-No. Claude generates the `.tex` files. You just compile them (`pdflatex file.tex`). The templates handle all formatting.
+No, not for the resume or cover letter — Claude renders those straight to `.docx` and you open them in Word. Only the optional 5-page academic CV format uses LaTeX; if you use it, Claude generates the `.tex` and you compile it (`pdflatex file.tex`).
+
+**Q: Why doesn't the resume auto-export a PDF?**
+The `.docx` pipeline intentionally has no automated page-count/layout verification (Word reflows text, unlike LaTeX) and no PDF-export automation, to keep the toolchain to just `python-docx`/`pyyaml` — no LibreOffice or MS Word automation dependency. Open the `.docx`, confirm it looks right, and export to PDF yourself when you're ready to submit.
 
 **Q: How many papers should I extract?**
 All papers where you're first author or co-first author, plus key contributing-author papers. Quality matters more than quantity — 5 well-extracted papers beat 20 shallow ones.
@@ -196,13 +207,13 @@ All papers where you're first author or co-first author, plus key contributing-a
 Yes. The framework supports any role type — define them in `config.md`. Industry R&D, consulting, data science, and engineering roles all work. Just create appropriate bundles.
 
 **Q: What if I don't have a Google Scholar / ORCID?**
-Remove those lines from the templates. The framework adapts to what you have.
+Remove those fields from `resume_content_template.yaml` (or `cv_template.tex` for the CV format). The framework adapts to what you have.
 
 **Q: How do I update after publishing new papers?**
 Run `/setup-extract` on the new paper, then update your experience file and bundles. Existing session files are not affected.
 
 **Q: Can I use this with resume formats other than the included templates?**
-Yes. The `.cls` files define the visual style. You can modify them or write your own. The skills generate content based on the template structure — update the `[GENERATE: ...]` and `[FIXED: ...]` markers in your template.
+Yes. For the resume/CL, the `STYLE` dict and section functions in `docx_builder.py` define the visual style and structure — modify them (or add new ones) to change the look or section list. For the CV, the `.cls` files define the visual style; modify them or write your own. Either way, update the `[GENERATE: ...]` and `[FIXED: ...]` markers in your content template to match.
 
 **Q: Can multiple people use the same kit?**
 Each person needs their own clone with their own `config.md`, knowledge base, and templates. The framework itself is shared; the content is personal.

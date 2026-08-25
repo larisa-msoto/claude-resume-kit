@@ -313,7 +313,7 @@ If a cover letter was generated in the same session, run all checks below. Detec
 ```markdown
 # Critique: [Company] [Role Title] ([Job ID])
 
-**Resume/CV File:** `output/[filename].tex`
+**Resume/CV File:** `output/[filename].yaml`/`.docx` (resume) or `.tex` (CV)
 **Date:** [date]
 
 ---
@@ -454,25 +454,27 @@ Any failure is a Tier 1 fix in Part 4.
 Final mechanical checklist. Run AFTER all other critique parts. These are pass/fail checks, not scored dimensions.
 
 ### Mechanical Checks
-- [ ] All bullets within char limits (no OVER violations from char_count.py)
-- [ ] All multi-line bullets pass orphan check (last line >= 70% fill)
-- [ ] Page fill within budget (resume: <= 3 lines white space on page 2; CV: 45 rendered bullet lines)
-- [ ] No ordering errors in bullet sequencing
+- [ ] **Resume:** All positions/bullets within word limits (no OVER violations from content_check.py)
+- [ ] **CV:** All bullets within char limits (no OVER violations from char_count.py); multi-line bullets pass orphan check (last line >= 70% fill)
+- [ ] **Resume:** total word count within page-fill target (see resume_reference.md) — actual page count NOT verified, note this explicitly
+- [ ] **CV:** Page fill within budget (45 rendered bullet lines), verified via compile
+- [ ] No ordering errors in position/bullet sequencing
 
 ### Content Checks
 - [ ] ATS keywords present (>= 70% match rate)
 - [ ] All provenance flags correct (see CLAUDE.md for project-specific flags)
 - [ ] No forbidden terms (see CLAUDE.md for project-specific corrections)
 - [ ] No inflation (contributing-author verbs hedged, no false claims)
-- [ ] Publication entries match pub_metadata.md (titles, journals, years)
-- [ ] Cover letter claims traceable to resume/CV bullets
+- [ ] Publication entries match pub_metadata.md (titles, journals, years); resume publications capped at 5
+- [ ] Cover letter claims traceable to resume/CV content
 
 ### Structural Checks
 - [ ] Company/institution name spelled correctly throughout
-- [ ] .tex file has complete preamble (will compile standalone)
+- [ ] **Resume/CL:** `docx_builder.py render` exits cleanly, producing a valid `.docx`
+- [ ] **CV:** `.tex` file has complete preamble (will compile standalone)
 - [ ] Date format consistent (Mon YYYY -- Mon YYYY)
 - [ ] Email address is correct (see CLAUDE.md for configured email)
-- [ ] Page count correct after compile (resume=2, CV=5)
+- [ ] **CV:** Page count correct after compile (resume=2, CV=5). **Resume/CL:** page count not automatically verified — user confirms in Word.
 
 **If any check fails, flag it as a Tier 1 fix in Part 4.**
 

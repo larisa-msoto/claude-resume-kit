@@ -10,11 +10,11 @@
 Standard JD pipeline uses 3 sessions for token efficiency + quality:
 
 Session 1: `/make-resume JDs/JD_xyz.txt`
-  → Phase 0 (research) → STOP → Phase 1 (bullets) → STOP → Phase 2 (resume) → STOP
+  → Phase 0 (research) → STOP → Phase 1 (content plan) → STOP → Phase 2 (resume: content YAML → docx | CV: .tex → pdflatex) → STOP
   → "Resume done. Copy after /clear: /make-cl output/<Folder>/session_<name>.md"
 
 Session 2: `/make-cl output/<Folder>/session_<name>.md`
-  → Load context → generate CL → compile → STOP
+  → Load context → generate CL (content YAML → docx) → STOP
   → "CL done. Copy after /clear: /critique output/<Folder>/session_<name>.md"
 
 Session 3: `/critique output/<Folder>/session_<name>.md`
@@ -22,7 +22,7 @@ Session 3: `/critique output/<Folder>/session_<name>.md`
   → If approved: finalization check → "Package complete in output/<Folder>/"
 
 If edits needed after critique:
-  /clear → /edit-resume output/<Folder>/e2e_<name>_cv.tex output/<Folder>/critique_<name>.md
+  /clear → /edit-resume output/<Folder>/e2e_<name>_resume.yaml output/<Folder>/critique_<name>.md (or `_cv.tex` for the CV path)
   /clear → /critique output/<Folder>/session_<name>.md (re-critique)
 
 ---
@@ -42,10 +42,11 @@ Every JD gets a persistent session file: `output/<FolderName>/session_<name>.md`
 
 **Naming:** Derive `<name>` from company/role — lowercase, underscores (e.g., `acme_engineer`, `natlab_postdoc`).
 
-**All output files use the same key:**
+**All output files use the same key. Extensions differ by format:**
 - `output/<FolderName>/session_<name>.md` — context file
-- `output/<FolderName>/e2e_<name>_resume.tex` or `_cv.tex` — generated document
-- `output/<FolderName>/e2e_<name>_cover_letter.tex` — cover letter
+- **Resume (docx):** `output/<FolderName>/e2e_<name>_resume.yaml` (content source) + `.docx` (rendered)
+- **CV (LaTeX, unchanged):** `output/<FolderName>/e2e_<name>_cv.tex` — generated document
+- **Cover letter (docx):** `output/<FolderName>/e2e_<name>_cover_letter.yaml` (content source) + `.docx` (rendered)
 - `output/<FolderName>/critique_<name>.md` — critique
 
 **Re-read the session file at the start of EVERY phase** to restore context after compaction.
@@ -54,9 +55,9 @@ Every JD gets a persistent session file: `output/<FolderName>/session_<name>.md`
 
 ## Session File Derivation (for /make-cl, /critique, and /edit-resume)
 
-From .tex path: strip `e2e_` prefix (if present) + `_resume.tex`/`_cv.tex`/`_cover_letter.tex` suffix → `<name>`.
+From the output file path: strip `e2e_` prefix (if present) + `_resume.yaml`/`_resume.docx`/`_cv.tex`/`_cover_letter.yaml`/`_cover_letter.docx` suffix → `<name>`.
 
-Example: `output/Acme/e2e_acme_engineer_resume.tex` → `acme_engineer` → look for `session_acme_engineer.md`
+Example: `output/Acme/e2e_acme_engineer_resume.docx` → `acme_engineer` → look for `session_acme_engineer.md`
 
 **Search order:**
 1. Direct path from $ARGUMENTS
@@ -82,11 +83,13 @@ Per-phase examples are in each SKILL.md.
 
 ---
 
-## Char Count Enforcement
+## Budget Enforcement
 
-Run `python3 resume_builder/helpers/char_count.py` after each section or position you write/edit.
+**Resume/CL (docx):** Run `python3 resume_builder/helpers/content_check.py resume|cover_letter <content.yaml>` after each section or position you write/edit. Word-count based — no exact page-fit guarantee, see resume_reference.md.
 
-The tool is authoritative — never trust mental math for char counts. If the tool fails, fall back to manual count and flag: "char_count.py unavailable — manual count, verify after compile."
+**CV (LaTeX, unchanged):** Run `python3 resume_builder/helpers/char_count.py -f cv <file.tex>` after each section or bullet.
+
+The tool is authoritative — never trust mental math. If a tool fails, fall back to manual count and flag it explicitly in your output.
 
 ---
 
@@ -108,13 +111,14 @@ The tool is authoritative — never trust mental math for char counts. If the to
 **Steps:**
 1. Verify all expected files exist in `output/<FolderName>/`:
    - `session_<name>.md`
-   - `e2e_<name>_[resume|cv].tex` + `.pdf` + compile artifacts
-   - `e2e_<name>_cover_letter.tex` + `.pdf` + compile artifacts
+   - Resume: `e2e_<name>_resume.yaml` + `.docx` — OR CV: `e2e_<name>_cv.tex` + `.pdf` + compile artifacts
+   - `e2e_<name>_cover_letter.yaml` + `.docx`
    - `critique_<name>.md`
-2. Rename final PDFs for submission (derive name from `config.md` Personal Info):
-   - `cp e2e_<name>_[resume|cv].pdf <Firstname>_<Lastname>_[Resume|CV].pdf`
-   - `cp e2e_<name>_cover_letter.pdf <Firstname>_<Lastname>_Cover_Letter.pdf`
+2. Rename final deliverables for submission (derive name from `config.md` Personal Info):
+   - `cp e2e_<name>_resume.docx <Firstname>_<Lastname>_Resume.docx` (or `_cv.pdf` → `_CV.pdf` for the CV path)
+   - `cp e2e_<name>_cover_letter.docx <Firstname>_<Lastname>_Cover_Letter.docx`
    - Keep originals alongside
+   - Reminder for resume/CL: the user should open each `.docx` in Word, confirm page count/formatting, and export to PDF themselves before submitting — this pipeline does not auto-export a PDF.
 3. Confirm to user: "Package complete in output/<FolderName>/ — [N] files"
 
 ---

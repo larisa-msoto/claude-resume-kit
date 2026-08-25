@@ -1,7 +1,8 @@
 # Cover Letter Generation — Reference
 
 > CL-specific rules. Read by `/make-cl` and `/edit-resume` (for CL edits).
-> Shared rules (provenance, anti-fabrication, LaTeX notation): `CLAUDE.md`
+> Shared rules (provenance, anti-fabrication): `CLAUDE.md`
+> Output: content YAML (`cover_letter_content_template.yaml` shape) rendered via `resume_builder/helpers/docx_builder.py` to `.docx`. Word counts below are validated with `resume_builder/helpers/content_check.py cover_letter <content.yaml> --institution [industry|national_lab|academic_postdoc|academic_faculty]`. Inline markup: `**bold**` and `[text](url)`.
 
 ---
 

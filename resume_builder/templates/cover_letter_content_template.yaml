@@ -1,0 +1,40 @@
+# TEMPLATE: Cover letter content -- structural reference for Claude generation
+# Fill [CONFIG: ...] from config.md, [GENERATE: ...] per JD (see cl_reference.md
+# for paragraph structure by institution type).
+#
+# Rendered with: python3 resume_builder/helpers/docx_builder.py render cover_letter <this file> <output.docx>
+# Word-count check: python3 resume_builder/helpers/content_check.py cover_letter <this file> --institution [industry|national_lab|academic_postdoc|academic_faculty]
+#
+# INLINE MARKUP: **bold** and [link text](url) supported in body_paragraphs.
+
+header:
+  name: "[CONFIG: Full Name, Degree]"
+  location: "[CONFIG: City, State]"
+  phone: "[CONFIG: phone]"
+  email: "[CONFIG: email]"
+
+# GENERATE: recipient block lines, one per list item.
+recipient:
+  - "Hiring Committee"
+  - "[GENERATE: Department/Group Name]"
+  - "[GENERATE: Company/Institution Name]"
+  - "[GENERATE: City, State ZIP]"
+
+date: "[GENERATE: today's date]"
+salutation: "Dear Members of the Hiring Committee,"
+
+# GENERATE: 3 paragraphs (Industry, 250-300 words) or 4 paragraphs
+# (National Lab / Academic, 350-450 words; Academic faculty 450-650 words).
+# See cl_reference.md for the P1/P2/P3(/P4) structure per institution type.
+# Open with a specific reference to their work -- no generic openers.
+body_paragraphs:
+  - "[GENERATE: P1 -- Hook. Connect their work to your methodology. State the position.]"
+  - "[GENERATE: P2 -- Current position, key results with quantified metrics.]"
+  - "[GENERATE: P3 -- Previous positions, transferable methodology arc, quantified.]"
+  # - "[GENERATE: P4 (National Lab/Academic only) -- Closing vision + collaboration + call to action.]"
+
+closing: "Sincerely,"
+signature:
+  - "[CONFIG: Full Name, Degree]"
+  - "[GENERATE: Your Current Title]"
+  - "[GENERATE: Your Current Institution]"

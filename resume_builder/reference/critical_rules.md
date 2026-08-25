@@ -1,15 +1,26 @@
 # Critical Rules — Compact Re-Read
 
 > Quick reference for Phase 2 generation. Full rules in `resume_reference.md`.
+> Resume = docx/word-count pipeline. CV = LaTeX/char-count pipeline (unchanged). Sections below are marked accordingly.
 
-## Character Limits
+## Word Limits — Resume [docx]
 
-**Resume (10pt, textwidth=7.5in):**
+**Work Experience paragraph tiers (word count, no bullets):**
 
-| Target Lines | Rendered Char Range | HARD MAX | Orphan Threshold |
-|-------|---------------|---------|------------------|
-| 1 line | 105-111 chars | 117 | -- |
-| 2 lines | 189-205 chars | 218 | Last line >= 78 chars |
+| Tier | Sentences | Word Range | HARD MAX |
+|------|-----------|------------|----------|
+| P-Short | 1 | 19-28 | 32 |
+| P-Medium | 2 | 35-48 | 54 |
+| P-Long | 3-4 | 53-61 | 68 |
+
+**Flat bullets (Technical Skills / Work Samples / Cross-Functional Leadership):** 25-38 words each, HARD MAX 44.
+
+No orphan rule, no bold-width penalty math — Word reflows text, so there's no exact per-line guarantee. Verify with:
+```bash
+python3 resume_builder/helpers/content_check.py resume <content.yaml>
+```
+
+## Character Limits — CV [LaTeX, unchanged]
 
 **CV (11pt, textwidth=7.5in):**
 
@@ -19,30 +30,30 @@
 | 2 lines | 168-182 chars | 190 | Last line >= 65 chars |
 | 3 lines | 250-268 chars | 280 | Last line >= 65 chars |
 
-### Variant Naming
+CV Bold Width Penalty: Effective limit = 91 - (0.25 x bold_char_count)
 
-| Variant | Document | Lines | Target Range | HARD MAX | Orphan | Word Target |
-|---------|----------|-------|-------------|----------|--------|-------------|
-| Resume-1L | 1/2-page resume | 1 | 105-111 | 117 | -- | ~13 words |
-| Resume-2L | 2-page resume | 2 | 189-205 | 218 | >= 78 | ~23-25 words |
-| CV-2L | 5-page CV | 2 | 168-182 | 190 | >= 65 | ~21-22 words |
-| CV-3L | 5-page CV | 3 | 250-268 | 280 | >= 65 | ~31-32 words |
+CV Orphan Rule: multi-line bullet's last rendered line must fill >= 70% of line width. 2L: >= 65 chars. 3L: >= 65 chars.
 
-## Bold Width Penalty
+Verify with: `python3 resume_builder/helpers/char_count.py -f cv <file.tex>`
 
-Resume (10pt): Effective limit = 119 - (0.5 x bold_char_count)
-CV (11pt): Effective limit = 91 - (0.25 x bold_char_count)
+## Variant Naming (combined)
 
-## Orphan Rule
-
-Multi-line bullet last rendered line must fill >= 70% of line width.
-Resume 2L: last line >= 78 chars. CV 2L: >= 65 chars. CV 3L: >= 65 chars.
+| Variant | Document | Budget Unit | Target Range | HARD MAX |
+|---------|----------|-------------|---------------|----------|
+| Resume P-Short | 2-page resume (Work Experience) | words | 19-28 | 32 |
+| Resume P-Medium | 2-page resume (Work Experience) | words | 35-48 | 54 |
+| Resume P-Long | 2-page resume (Work Experience) | words | 53-61 | 68 |
+| Resume flat bullet | 2-page resume (Skills/Work Samples/Cross-Functional) | words | 25-38 | 44 |
+| CV-2L | 5-page CV | rendered chars | 168-182 | 190 |
+| CV-3L | 5-page CV | rendered chars | 250-268 | 280 |
 
 ## FIXED Sections — NEVER Modify
 
-All FIXED sections (internships, education, publications, honors/awards, header block) are set in the template.
-NEVER change: \vspace values, \geometry settings, .cls formatting, header layout.
-Only modify VARIABLE sections: Summary, Technical Skills, Experience bullets/headers.
+**Resume:** header contact fields (name/location/phone/email/LinkedIn/GitHub/languages/immigration line), education, publications author/journal text, any FIXED position paragraph. **No Honors & Awards section.** `docx_builder.py`'s STYLE dict and section order are code-locked — never touched per generation.
+**CV:** internships, education, publications, honors/awards, header block — all set in the template. NEVER change: `\vspace` values, `\geometry` settings, `.cls` formatting, header layout.
+
+Resume VARIABLE fields: `summary`, `tagline`, Technical Skills/Work Samples/Cross-Functional Leadership text, Work Experience `theme`/`paragraph`.
+CV VARIABLE sections: Summary, Technical Expertise, Research Experience bullets/headers.
 
 ## Provenance Flags
 
@@ -55,7 +66,11 @@ See `CLAUDE.md` for your project-specific provenance flags. Common patterns:
 | Internal/proprietary | "infrastructure I developed" — not peer-reviewed |
 | Preprint only | Always flag provenance |
 
-## LaTeX Notation Quick-Ref
+## Inline Markup
+
+**Resume/CL (docx):** `**bold**` and `[link text](url)` — parsed by `docx_builder.py` into real bold runs / hyperlinks. No LaTeX notation needed or used.
+
+**CV (LaTeX) — Notation Quick-Ref:**
 
 | Item | Correct LaTeX | Wrong | Rendered |
 |------|--------------|-------|----------|
@@ -65,7 +80,7 @@ See `CLAUDE.md` for your project-specific provenance flags. Common patterns:
 | Greek letters | `$\alpha$-phase` | `alpha-phase` | α-phase |
 | Approximately | `$\sim$64` | `~64` (LaTeX non-breaking space!) | ~64 |
 
-CRITICAL: ~ in LaTeX = non-breaking space. Use $\sim$ for "approximately."
+CRITICAL (CV only): ~ in LaTeX = non-breaking space. Use $\sim$ for "approximately."
 
 ## KB Corrections
 
@@ -73,6 +88,6 @@ See `CLAUDE.md` for your project-specific KB corrections log. Always check befor
 
 ## Budget Reminder
 
-Resume: ~20 variable bullets (exact count depends on skills config + immigration line). CV: 19-21 bullets, 45 rendered lines.
-Resume bullets: ALL 2L. CV bullets: 2L/3L mix OK.
-**CV Page 1 rule:** First bullet of first experience MUST be 2L. A 3L first bullet overflows page 1.
+**Resume:** 6-9 Work Experience positions as paragraphs (P-Short/Medium/Long mix), plus 5-7 flat bullets each in Technical Skills/Work Samples/Cross-Functional Leadership. Target ~500-600 total body words for 2 pages (calibrate — see resume_reference.md Page Fill Budgets). No exact page-fit guarantee — open the `.docx` to confirm before submitting.
+
+**CV:** 19-21 bullets, 45 rendered lines. CV bullets: 2L/3L mix OK. **CV Page 1 rule:** First bullet of first experience MUST be 2L. A 3L first bullet overflows page 1.

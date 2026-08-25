@@ -1,0 +1,121 @@
+# TEMPLATE: Resume content -- structural reference for Claude generation
+# Copy this structure exactly. Replace [GENERATE: ...] placeholders with JD-tailored content.
+# FIXED fields: contain actual data -- never modify during generation
+# GENERATE fields: Claude fills in per JD using the uploaded bundle
+#
+# SETUP INSTRUCTIONS:
+# 1. Fill [CONFIG: ...] markers with values from your config.md
+# 2. Fill FIXED fields (Education, position dates/titles, publication author blocks) with your actual content
+# 3. Leave [GENERATE: ...] markers -- Claude fills these per JD
+# 4. Rendered with: python3 resume_builder/helpers/docx_builder.py render resume <this file> <output.docx>
+#
+# INLINE MARKUP: use **bold** and [link text](url) inside any text field --
+# docx_builder.py parses these into real Word bold runs / hyperlinks.
+#
+# BUDGETS (see resume_reference.md for full detail):
+#   Work Experience paragraph tiers: P-Short 19-28 words | P-Medium 35-48 words | P-Long 53-61 words
+#   Flat bullets (Technical Skills / Work Samples / Cross-Functional Leadership): 25-38 words each
+#   Run: python3 resume_builder/helpers/content_check.py resume <this file>
+
+header:
+  name: "[CONFIG: Full Name, Degree]"
+  tagline: "[GENERATE: Role Title | Domain Specialty | Key Method or Impact]"
+  location: "[CONFIG: City, State]"
+  phone: "[CONFIG: phone]"
+  email: "[CONFIG: email]"
+  linkedin:
+    label: "LinkedIn"
+    url: "[CONFIG: LinkedIn URL]"
+  github:
+    label: "GitHub"
+    url: "[CONFIG: website URL]"
+  languages: "[CONFIG: Languages]"
+  immigration_line: "[CONFIG: Immigration status line from config.md -- omit this field entirely for non-USA JDs]"
+
+# GENERATE: 4-5 sentences, bold the opening role-title phrase, e.g.
+# "**Genomic Scientist** with 5+ years combining **X** and **Y** for Z."
+# End with publication/citation metrics if applicable.
+summary: "[GENERATE: **Role Title** with [N]+ years combining **primary method** and **secondary method** for application domain. 1-2 sentences on key accomplishments tailored to JD. Metrics if applicable.]"
+
+# GENERATE paragraphs per JD; position dates/titles are FIXED.
+# Most recent first. 6-9 positions typical. Allocate P-Long to the 2-3 most
+# JD-relevant positions, P-Medium to supporting positions, P-Short to older/
+# tangential ones (mark a position's paragraph FIXED if it never changes across JDs).
+work_experience:
+  - theme: "[GENERATE: JD-Customized Theme]"
+    dates: "[FIXED: Start -- End]"
+    role_institution: "[FIXED: Title, Institution]"
+    paragraph: "[GENERATE: P-Long paragraph -- 3-4 sentences, strongest JD-relevant accomplishments]"
+  - theme: "[GENERATE: JD-Customized Theme]"
+    dates: "[FIXED: Start -- End]"
+    role_institution: "[FIXED: Title, Institution]"
+    paragraph: "[GENERATE: P-Long or P-Medium paragraph]"
+  - theme: "[GENERATE: JD-Customized Theme]"
+    dates: "[FIXED: Start -- End]"
+    role_institution: "[FIXED: Title, Institution]"
+    paragraph: "[GENERATE: P-Medium paragraph]"
+  # ... add as many positions as needed (6-9 typical)
+
+# GENERATE: 5-7 groups. Each item = bold label + one flowing sentence
+# (~25-38 words) naming the tools/methods. Order most JD-relevant first.
+technical_skills:
+  - label: "[GENERATE: Most JD-Relevant Domain]"
+    text: "[GENERATE: tools, methods, libraries -- one flowing sentence]"
+  - label: "[GENERATE: Second Domain]"
+    text: "[GENERATE]"
+  - label: "[GENERATE: Third Domain]"
+    text: "[GENERATE]"
+  - label: "[GENERATE: Fourth Domain]"
+    text: "[GENERATE]"
+  - label: "[GENERATE: Fifth Domain]"
+    text: "[GENERATE]"
+
+# GENERATE: select/reorder categories and items by JD relevance. Items are
+# hyperlinked -- source URLs from bundle/experience files, never invent a link.
+work_samples:
+  - category: "[GENERATE: Category, e.g. Bioinformatics tools and pipelines]"
+    items:
+      - text: "[FIXED: Item]"
+        url: "[FIXED: URL]"
+      - text: "[FIXED: Item]"
+        url: "[FIXED: URL]"
+  - category: "[GENERATE: Category]"
+    items:
+      - text: "[FIXED: Item]"
+        url: "[FIXED: URL]"
+
+# FIXED: copy from your actual education, never edited per JD.
+education:
+  - degree: "[FIXED: Degree Title]"
+    dates: "[FIXED: Start -- End]"
+    institution: "[FIXED: Institution]"
+    location: "[FIXED: Location]"
+    gpa: "[FIXED: N/N]"
+  - degree: "[FIXED: Degree Title]"
+    dates: "[FIXED: Start -- End]"
+    institution: "[FIXED: Institution]"
+    location: "[FIXED: Location]"
+    gpa: "[FIXED: N/N]"
+
+# GENERATE: score all publications per JD relevance (pub_metadata.md), list
+# ONLY the top 5. docx_builder.py also hard-caps at 5 as a safety net.
+publications:
+  scholar_url: "[CONFIG: Google Scholar URL]"
+  paper_count: "[FIXED: N]"
+  citation_count: "[FIXED: N]"
+  items:
+    - "[GENERATE: Publication 1 -- most JD-relevant, author list + journal + year]"
+    - "[GENERATE: Publication 2]"
+    - "[GENERATE: Publication 3]"
+    - "[GENERATE: Publication 4]"
+    - "[GENERATE: Publication 5]"
+
+# GENERATE: bold label + 1-2 sentence description per bullet (~25-38 words),
+# selected/reframed from bundle leadership/mentorship/service achievements.
+cross_functional_leadership:
+  - label: "[GENERATE: Label, e.g. Stakeholder alignment]"
+    text: "[GENERATE: 1-2 sentence description]"
+  - label: "[GENERATE: Label, e.g. People mentorship]"
+    text: "[GENERATE: 1-2 sentence description]"
+  - label: "[GENERATE: Label]"
+    text: "[GENERATE: 1-2 sentence description]"
